@@ -20,7 +20,8 @@
 Module:       proviz-json
 Description:  Make JSON files for Proviz from Protmiscuity data
 Version:      0.2
-Last Edit:    2018-05-28
+Python:       2.7.12
+Last Edit:    2018-11-10
 Functions:
 	None
 Class:

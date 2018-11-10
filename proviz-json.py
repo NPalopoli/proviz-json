@@ -19,7 +19,7 @@
 """
 Module:       proviz-json
 Description:  Make JSON files for Proviz from Protmiscuity data
-Version:      0.1
+Version:      0.2
 Last Edit:    2018-05-28
 Functions:
 	None
@@ -77,7 +77,7 @@ class protmiscuity():
 		# Data
 		self.protein_data = {}
 		self.protein_json = {}
-		self.protein_fields = ("Sitio_act_can","Sitio_act_prom")
+		self.protein_fields = ("can_act_site","prom_act_site")
 
 	##------------------------------------------------------------------------##
 	# check_data_directory function - Ensure data path exists
@@ -164,7 +164,7 @@ class protmiscuity():
 		'''
 		# Define list of relevant fields
 		field_proteina = ["secuencia","codigo_uni_prot"]
-		field_sitios_activos = ["Sitio_act_can","Sitio_act_prom"]
+		field_sitios_activos = ["can_act_site","prom_act_site"]
 		# Identify table by use of relevant fields as dict keys
 		if all (field in pm_dict[next(iter(pm_dict))][0] for field in field_proteina):
 			field_names = field_proteina
@@ -175,6 +175,10 @@ class protmiscuity():
 			# Create key in protein data dict if needed
 			if not protein_id in self.protein_data:
 				self.protein_data[protein_id] = {}
+				for field in field_proteina:
+					self.protein_data[protein_id][field] = ''
+				for field in field_sitios_activos:
+					self.protein_data[protein_id][field] = ''
 			# Iterate over relevant fields
 			for field in field_names:
 				# Copy values into protein data dict
@@ -206,8 +210,12 @@ class protmiscuity():
 		'''
 		Make JSON structure for data field in types of sites
 		'''
+		# Remove non-determined positions from list
+		site_pos_list = site_pos.split(',')
+		if 'ND' in site_pos_list:
+			site_pos_list.remove('ND')
 		# Make list of positions as int
-		pos_list = map(int,site_pos.split(','))
+		pos_list = map(int,site_pos_list)
 		# Make list of position ranges
 		if pos_list is None:
 			pos_ranges = ['']
@@ -226,9 +234,9 @@ class protmiscuity():
 				# Define colour
 				site_data_dict["colour"] = "#0087ff"
 				# Get type of site
-				if site_type == "Sitio_act_can":
+				if site_type == "can_act_site":
 					site_data_dict["hover"] = "canonic site"
-				elif site_type == "Sitio_act_prom":
+				elif site_type == "prom_act_site":
 					site_data_dict["hover"] = "promiscuous site"
 				# Add fields to list in data field
 				site_data_list.append(site_data_dict)
@@ -248,14 +256,14 @@ class protmiscuity():
 		site_data["type"] = "peptides"
 		site_data["position"] = "-1"
 		# Define fields specific of type of site
-		if site_type == "Sitio_act_can":  # canonic site
+		if site_type == "can_act_site":  # canonic site
 			site_data["name"] = "canonic site"
 			site_data["colour"] = "#0087ff"
 			site_data["help"] = "Canonic site residues annotated in ProtMiscuity"
 			site_data["text_colour"] = "#000"
 			# Make JSON structure for data field
 			site_data["data"] = self.makeJSONPerSiteData(site_type,site_pos,sequence)
-		elif site_type == "Sitio_act_prom":  # promiscuouos site
+		elif site_type == "prom_act_site":  # promiscuous site
 			site_data["name"] = "promiscuous site"
 			site_data["colour"] = "#FF0054"
 			site_data["help"] = "Promiscuous site residues annotated in ProtMiscuity"
@@ -300,7 +308,7 @@ if __name__ == "__main__":
 	pm_proteina = protmiscuityObj.parseProtMiscuity("proteina.csv","id")
 	protmiscuityObj.mergeProtMiscuity(pm_proteina)
 	# Parse ProtMiscuity active site data file
-	pm_sitios_activos = protmiscuityObj.parseProtMiscuity("sitios_activos.csv","proteina_id")
+	pm_sitios_activos = protmiscuityObj.parseProtMiscuity("sitio_activo.csv","proteina_id")
 	protmiscuityObj.mergeProtMiscuity(pm_sitios_activos)
 	# Iterate over protein IDs
 	for protein_id in protmiscuityObj.protein_data:

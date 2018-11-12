@@ -216,11 +216,12 @@ class protmiscuity():
 		if 'ND' in site_pos_list:
 			site_pos_list.remove('ND')
 		# Make list of positions as int
-		pos_list = map(int,site_pos_list)
-		# Make list of position ranges
-		if pos_list is None:
+		if '' in site_pos_list:
 			pos_ranges = ['']
+			site_data_list = []
 		else:
+			# Make list of position ranges
+			pos_list = map(int,site_pos_list)
 			site_data_list = []
 			pos_ranges = list(self.findRanges(pos_list))
 			# Iterate over positions
